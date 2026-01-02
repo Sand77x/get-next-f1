@@ -12,6 +12,11 @@ Shanghai sq 12345677
 Timestamp is in unix time (seconds since epoch). Use it however you like via `./get-next.sh`, I use this to have f1 data in my i3status bar xd.   
 There's only 2 files so if you want custom functionality it should be really easy to fork it yourself. Sorry for bad code lol.  
 
+### Dependencies
+- Bash
+- Python3
+- the Ergast API not dying 🙏
+
 ### Installation
 ``` sh
 git clone https://github.com/Sand77x/get-next-f1.git 
