@@ -1,11 +1,12 @@
 ### Get next F1 race
-Short script(s) I wrote that just outputs the next race in this format
+Short script(s) I wrote that just outputs the next F1 session in this format
 ``` sh
 location session_name timestamp
 ```
 Example:
 ``` sh
 Melbourne fp1 12345677  
+Shanghai sq 12345677  
 ```  
 
 Timestamp is in unix time (seconds since epoch). Use it however you like via `./get-next.sh`, I use this to have f1 data in my i3status bar xd.   
@@ -21,7 +22,7 @@ chmod +x get-next.sh
 ### API
 Uses the Ergast API to get data for the current season, then caches it so repeated calls are fast. Well, we only cache once a year basically.
 ### Caching
-The python script is for caching purposes, if you want a TSV file of all races in the current season, execute the file via `./cache.py` and check `$HOME/.cache/f1/season.tsv`. Each column means __location__, __is_sprint__, then __timestamps for sessions 1 - 5__ respectively (session 2 and 3 are either fp2/fp3 or sq/sprint).
+The python script is for caching purposes, if you want a TSV file of all sessions in the current season, execute the file via `./cache.py` and check `$HOME/.cache/f1/season.tsv`. Each column means __location__, __is_sprint__, then __timestamps for sessions 1 - 5__ respectively (session 2 and 3 are either fp2/fp3 or sq/sprint).
 ```
 2026
 Melbourne	NO	1772760600	1772773200	1772847000	1772859600	1772942400
