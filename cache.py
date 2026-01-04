@@ -5,9 +5,14 @@ from datetime import datetime, timezone
 from urllib.request import urlopen
 import json
 import csv
+import sys
 
-CACHE = Path.home() / ".cache/f1/season.tsv"
-URL = f"https://api.jolpi.ca/ergast/f1/{datetime.now().year}.json"
+# !!IMPORTANT 
+# first argument is the year to cache!
+URL = f"https://api.jolpi.ca/ergast/f1/{sys.argv[1]}.json"
+
+CACHE_DIR = Path.home() / ".cache/get-next-f1/"
+CACHE_TSV = CACHE_DIR / "season.tsv"
 
 def get_data():
     with urlopen(URL) as resp:
@@ -49,7 +54,9 @@ def fmt_useful_info():
 def write_cache():
     info = fmt_useful_info()
 
-    with open(CACHE, "w") as file:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+    with open(CACHE_TSV, "w") as file:
         writer = csv.writer(file, delimiter="\t", lineterminator="\n")
         writer.writerow([info['year']])
 

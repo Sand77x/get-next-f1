@@ -15,7 +15,6 @@ There's only 2 files so if you want custom functionality it should be really eas
 ### Dependencies
 - Bash
 - Python3
-- the Ergast API not dying 🙏
 
 ### Installation
 ``` sh
@@ -25,9 +24,9 @@ chmod +x cache.py
 chmod +x get-next.sh
 ```
 ### API
-Uses the Ergast API to get data for the current season, then caches it so repeated calls are fast. Well, we only cache once a year basically.
+Uses the [Jolpica API](https://github.com/jolpica/jolpica-f1) to get data for the current season, then caches it so repeated calls are fast. Well, we only cache once a year basically.
 ### Caching
-The python script is for caching purposes, if you want a TSV file of all sessions in the current season, execute the file via `./cache.py` and check `$HOME/.cache/f1/season.tsv`. Each column means __location__, __is_sprint__, then __timestamps for sessions 1 - 5__ respectively (session 2 and 3 are either fp2/fp3 or sq/sprint).
+The python script is for caching purposes, if you want a TSV file of all sessions in the current season, execute the file via `./cache.py` and check `$HOME/.cache/get-next-f1/season.tsv`. Each column means __location__, __is_sprint__, then __timestamps for sessions 1 - 5__ respectively (session 2 and 3 are either fp2/fp3 or sq/sprint).
 ```
 2026
 Melbourne	NO	1772760600	1772773200	1772847000	1772859600	1772942400

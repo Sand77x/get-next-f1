@@ -1,40 +1,60 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# echoes next race info to STDOUT
-# format: location session_name timestamp
-# EX. Melbourne fp1 12345677
-# Note: timestamp is in unix time (seconds since epoch)
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cache_script="$script_dir/cache.py"
+cache_file="$HOME/.cache/get-next-f1/season.tsv"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CACHE_SCRIPT="$SCRIPT_DIR/cache.py"
-CACHE="$HOME/.cache/f1/season.tsv"
-
-now=$(date +%s)  
+now=$(date +%s)
 current_year=$(date +%Y)
 
-if [ -f "$CACHE" ]; then
-    cached_year=$(head -n1 "$CACHE")
-else
-    cached_year=0
+# create cache if not exist
+if [ ! -f "$cache_file" ]; then
+    "$cache_script" "$current_year"
 fi
 
-if [ "$current_year" -ne "$cached_year" ]; then
-    "$CACHE_SCRIPT"
-fi
+{
+    read -r cached_year || cached_year=0
 
-sessions=("fp1" "fp2" "fp3" "sq" "sprint" "quali" "race")
+    # refresh if cache is behind real year
+    if (( cached_year < current_year )); then
+        "$cache_script" "$current_year"
+        exec "$0"
+    fi
 
-while IFS=$'\t' read -r loc spr s1 s2 s3 s4 s5 s6 s7; do
-    # Map s1..s7 to session timestamps
-    timestamps=("$s1" "$s2" "$s3" "$s4" "$s5" "$s6" "$s7")
+    saw_race=0
 
-    for i in "${!sessions[@]}"; do
-        session_name="${sessions[i]}"
-        ts="${timestamps[i]}"
+    while IFS=$'\t' read -r loc spr s1 s2 s3 s4 s5; do
+        saw_race=1
 
-        if [ "$now" -lt "$((ts))" ]; then
-            echo "$loc $session_name $ts"
-            exit
+        (( now > s5 )) && continue
+
+        sessions=("fp1" "fp2" "fp3" "quali" "race")
+        timestamps=("$s1" "$s2" "$s3" "$s4" "$s5")
+
+        # if sprint, map sessions accordingly
+        if [ "$spr" = "YES" ]; then
+            sessions[1]="sq"
+            sessions[2]="sprint"
         fi
+
+        for i in "${!sessions[@]}"; do
+            if (( now < timestamps[i] )); then
+                echo "$loc ${sessions[i]} ${timestamps[i]}"
+                exit
+            fi
+        done
     done
-done < "$CACHE"
+
+    # if season done but API is not updated
+    if (( ! saw_race )); then
+        echo "Season done!"
+        exit 0
+    fi
+
+    # if season done and API is updated
+    next_year=$((cached_year + 1))
+    "$cache_script" "$next_year"
+    exec "$0"
+
+} < "$cache_file"
